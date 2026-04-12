@@ -63,7 +63,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # ─── Database ─────────────────────────────────────────────────────────────────
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_PUBLIC_URL') or os.environ.get('DATABASE_URL')
+
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
