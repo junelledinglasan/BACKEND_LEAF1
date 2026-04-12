@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -62,12 +63,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # ─── Database ─────────────────────────────────────────────────────────────────
 DATABASES = {
     'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'leaf_mpc_db',
-        'USER':     'postgres',
-        'PASSWORD': 'admin123',   # ← palitan ng iyong PostgreSQL password
-        'HOST':     'localhost',
-        'PORT':     '5432',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('PGDATABASE', 'leaf_mpc_db'),
+        'USER': os.environ.get('PGUSER', 'postgres'),
+        'PASSWORD': os.environ.get('PGPASSWORD', 'admin123'),
+        'HOST': os.environ.get('PGHOST', 'localhost'),
+        'PORT': os.environ.get('PGPORT', '5432'),
     }
 }
 
