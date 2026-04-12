@@ -100,6 +100,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5174',
     'http://localhost:5175',
     'http://127.0.0.1:5173',
+    'https://leaf-mpc-system.vercel.app',
+    'https://leaf-mpc-system-git-main-junelledinglasans-projects.vercel.app',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
