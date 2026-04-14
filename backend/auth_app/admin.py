@@ -10,8 +10,13 @@ class UserAdmin(Base):
     search_fields = ['username', 'name']
     ordering      = ['-created_at']
     fieldsets     = (
-        (None,           {'fields': ('username', 'password')}),
-        ('Info',         {'fields': ('name', 'role')}),
-        ('Permissions',  {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        (None,          {'fields': ('username', 'password')}),
+        ('Info',        {'fields': ('name', 'role')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
     )
-    add_fieldsets = ((None, {'classes': ('wide',), 'fields': ('username', 'name', 'role', 'password1', 'password2')}),)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields':  ('username', 'name', 'role', 'password1', 'password2'),
+        }),
+    )

@@ -3,15 +3,21 @@ from auth_app.models import User
 
 
 class Announcement(models.Model):
-    TYPES = [('Activity','Activity'),('Seminar','Seminar'),('Notice','Notice')]
+    TYPE_CHOICES = [
+        ('Activity',     'Activity'),
+        ('Seminar',      'Seminar'),
+        ('Notice',       'Notice'),
+        ('Announcement', 'Announcement'),
+        ('Event',        'Event'),
+    ]
 
     title      = models.CharField(max_length=200)
     body       = models.TextField()
-    type       = models.CharField(max_length=20, choices=TYPES, default='Notice')
+    type       = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Notice')
     posted_by  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='announcements')
+    is_active  = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_active  = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'announcements'
@@ -32,4 +38,4 @@ class AnnouncementComment(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f'Comment by {self.posted_by.username} on {self.announcement.title}'
+        return f'Comment by {self.posted_by.username}'

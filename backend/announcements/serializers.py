@@ -8,8 +8,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = AnnouncementComment
-        fields = ['id','body','posted_by','posted_by_name','posted_by_role','created_at']
-        read_only_fields = ['posted_by','created_at']
+        fields = ['id', 'body', 'posted_by', 'posted_by_name', 'posted_by_role', 'created_at']
+        read_only_fields = ['posted_by', 'created_at']
 
 
 class AnnouncementSerializer(serializers.ModelSerializer):
@@ -20,8 +20,13 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Announcement
-        fields = ['id','title','body','type','posted_by','posted_by_name','posted_by_role','created_at','updated_at','is_active','comment_count','comments']
-        read_only_fields = ['posted_by','created_at','updated_at']
+        fields = [
+            'id', 'title', 'body', 'type',
+            'posted_by', 'posted_by_name', 'posted_by_role',
+            'is_active', 'created_at', 'updated_at',
+            'comment_count', 'comments',
+        ]
+        read_only_fields = ['posted_by', 'created_at', 'updated_at']
 
     def get_comment_count(self, obj):
         return obj.comments.count()
@@ -34,7 +39,11 @@ class AnnouncementListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Announcement
-        fields = ['id','title','body','type','posted_by_name','posted_by_role','created_at','is_active','comment_count']
+        fields = [
+            'id', 'title', 'body', 'type',
+            'posted_by_name', 'posted_by_role',
+            'is_active', 'created_at', 'comment_count',
+        ]
 
     def get_comment_count(self, obj):
         return obj.comments.count()

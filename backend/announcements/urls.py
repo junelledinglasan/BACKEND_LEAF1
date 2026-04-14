@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import announcement_list_view, announcement_detail_view, add_comment_view, delete_comment_view
+from .views import (
+    announcement_list_view,
+    announcement_detail_view,
+    add_comment_view,
+    delete_comment_view,
+)
 
 urlpatterns = [
     path('',                                    announcement_list_view,   name='ann-list'),

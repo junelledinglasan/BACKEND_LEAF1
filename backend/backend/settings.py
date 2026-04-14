@@ -1,14 +1,15 @@
 from pathlib import Path
 from datetime import timedelta
-import os
-import dj_database_url
 
+# ─── Base Directory ───────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ─── Security ─────────────────────────────────────────────────────────────────
 SECRET_KEY = 'django-insecure-leaf-mpc-2026-change-in-production'
-DEBUG = True
+DEBUG      = True
 ALLOWED_HOSTS = ['*']
 
+# ─── Installed Apps ───────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -16,12 +17,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third party
+
+    # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-    # Local apps
+
+    # LEAF MPC Apps
     'auth_app',
     'members',
     'loans',
@@ -30,8 +33,9 @@ INSTALLED_APPS = [
     'reports',
 ]
 
+# ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',          # Must be FIRST
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,27 +65,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# ─── Database ─────────────────────────────────────────────────────────────────
-
-DATABASE_URL = os.environ.get('DATABASE_PUBLIC_URL') or os.environ.get('DATABASE_URL')
-
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+# ─── Database — PostgreSQL ────────────────────────────────────────────────────
+# ⚠️ Palitan ang PASSWORD ng iyong actual na PostgreSQL password
+DATABASES = {
+    'default': {
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'leaf_mpc_db',
+        'USER':     'postgres',
+        'PASSWORD': 'admin123',    # ← palitan ng iyong password
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'leaf_mpc_db',
-            'USER': 'postgres',
-            'PASSWORD': 'admin123',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
+}
 
-# ─── Custom User Model ────────────────────────────────────────────────────────
+# ─── Custom Auth User ─────────────────────────────────────────────────────────
 AUTH_USER_MODEL = 'auth_app.User'
 
 # ─── REST Framework ───────────────────────────────────────────────────────────
@@ -96,24 +93,18 @@ REST_FRAMEWORK = {
 
 # ─── JWT ──────────────────────────────────────────────────────────────────────
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME':  timedelta(hours=8),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS':  True,
+    'ACCESS_TOKEN_LIFETIME':    timedelta(hours=8),
+    'REFRESH_TOKEN_LIFETIME':   timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS':    True,
     'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_TYPES':        ('Bearer',),
+    'USER_ID_FIELD':            'id',
+    'USER_ID_CLAIM':            'user_id',
 }
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://127.0.0.1:5173',
-    'https://leaf-mpc-system.vercel.app',
-    'https://leaf-mpc-system-git-main-junelledinglasans-projects.vercel.app',
-]
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS  = True       # For development only
+CORS_ALLOW_CREDENTIALS  = True
 
 # ─── Internationalization ─────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
@@ -121,7 +112,7 @@ TIME_ZONE     = 'Asia/Manila'
 USE_I18N      = True
 USE_TZ        = True
 
-# ─── Static ───────────────────────────────────────────────────────────────────
+# ─── Static & Media ───────────────────────────────────────────────────────────
 STATIC_URL         = '/static/'
 MEDIA_URL          = '/media/'
 MEDIA_ROOT         = BASE_DIR / 'media'

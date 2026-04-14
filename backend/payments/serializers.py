@@ -10,20 +10,25 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Payment
         fields = '__all__'
-        read_only_fields = ['tx_id','hash','paid_at']
+        read_only_fields = ['tx_id', 'hash', 'paid_at', 'balance', 'recorded_by']
 
 
 class CreatePaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Payment
-        fields = ['loan','member','amount','note']
+        fields = ['loan', 'member', 'amount', 'note']
 
     def create(self, validated_data):
         loan   = validated_data['loan']
         amount = float(validated_data['amount'])
-        loan.balance = max(float(loan.balance) - amount, 0)
-        if loan.balance == 0: loan.status = 'Completed'
+
+        # Update loan balance
+        new_balance  = float(loan.balance) - amount
+        loan.balance = max(new_balance, 0)
+        if loan.balance == 0:
+            loan.status = 'Completed'
         loan.save()
+
         validated_data['balance']     = loan.balance
         validated_data['recorded_by'] = self.context['request'].user.username
         return super().create(validated_data)

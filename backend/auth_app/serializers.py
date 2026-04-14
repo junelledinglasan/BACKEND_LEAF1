@@ -4,6 +4,8 @@ from .models import User
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Adds user info to JWT token response."""
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)

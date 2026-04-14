@@ -1,4 +1,5 @@
-import hashlib, json
+import hashlib
+import json
 from django.db import models
 from django.utils import timezone
 from loans.models import Loan
@@ -25,9 +26,9 @@ class Payment(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.tx_id:
-            count = Payment.objects.count() + 1
+            count      = Payment.objects.count() + 1
             self.tx_id = f"TX-{timezone.now().strftime('%Y%m%d')}-{str(count).zfill(3)}"
         if not self.hash:
-            payload = json.dumps({'tx': self.tx_id, 'amount': str(self.amount)}, sort_keys=True)
-            self.hash = hashlib.sha256(payload.encode()).hexdigest()[:32] + '...'
+            payload    = json.dumps({'tx': self.tx_id, 'amount': str(self.amount)}, sort_keys=True)
+            self.hash  = hashlib.sha256(payload.encode()).hexdigest()[:32] + '...'
         super().save(*args, **kwargs)

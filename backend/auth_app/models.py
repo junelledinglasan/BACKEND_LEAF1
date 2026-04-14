@@ -3,23 +3,29 @@ from django.db import models
 
 
 class UserManager(BaseUserManager):
+
     def create_user(self, username, password=None, **extra):
         if not username:
-            raise ValueError('Username required.')
+            raise ValueError('Username is required.')
         user = self.model(username=username, **extra)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, password=None, **extra):
-        extra.setdefault('role', 'admin')
-        extra.setdefault('is_staff', True)
+        extra.setdefault('role',         'admin')
+        extra.setdefault('is_staff',     True)
         extra.setdefault('is_superuser', True)
         return self.create_user(username, password, **extra)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    ROLES = [('admin', 'Admin'), ('staff', 'Staff'), ('member', 'Member')]
+
+    ROLES = [
+        ('admin',  'Admin'),
+        ('staff',  'Staff'),
+        ('member', 'Member'),
+    ]
 
     username   = models.CharField(max_length=50, unique=True)
     name       = models.CharField(max_length=100)
