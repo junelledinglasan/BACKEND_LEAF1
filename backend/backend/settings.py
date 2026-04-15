@@ -1,15 +1,13 @@
 from pathlib import Path
 from datetime import timedelta
-import os
-import dj_database_url
 
 # ─── Base Directory ───────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ─── Security ─────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-local-key')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+SECRET_KEY = 'django-insecure-leaf-mpc-2026-change-in-production'
+DEBUG      = True
+ALLOWED_HOSTS = ['*']
 
 # ─── Installed Apps ───────────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -70,9 +68,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # ─── Database — PostgreSQL ────────────────────────────────────────────────────
 # ⚠️ Palitan ang PASSWORD ng iyong actual na PostgreSQL password
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
+    'default': {
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'leaf_mpc_db',
+        'USER':     'postgres',
+        'PASSWORD': 'admin123',    # ← palitan ng iyong password
+        'HOST':     'localhost',
+        'PORT':     '5432',
+    }
 }
 
 # ─── Custom Auth User ─────────────────────────────────────────────────────────
