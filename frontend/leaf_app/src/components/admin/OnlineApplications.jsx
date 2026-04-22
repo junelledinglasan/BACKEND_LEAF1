@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getApplicationsAPI, updateApplicationStatusAPI } from "../../api/loans";
+import { getApplicationsAPI, updateApplicationStatusAPI } from "../../api/members";
 import "./OnlineApplications.css";
 
 const STATUS_TABS   = ["All", "Pending", "Approved", "Rejected"];

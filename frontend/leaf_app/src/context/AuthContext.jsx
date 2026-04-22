@@ -9,13 +9,15 @@ export function AuthProvider({ children }) {
     try {
       const saved = localStorage.getItem("leaf_user");
       return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   });
 
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
 
-  // ─── Login ───────────────────────────────────────────────────────────────
+  // ─── Login ──────────────────────────────────────────────────────────────────
   const login = async (username, password) => {
     setLoading(true);
     setError("");
@@ -32,7 +34,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // ─── Logout ──────────────────────────────────────────────────────────────
+  // ─── Logout ─────────────────────────────────────────────────────────────────
   const logout = async () => {
     await logoutAPI();
     setUser(null);

@@ -5,9 +5,14 @@ import {
   Title, Tooltip, Legend, Filler,
 } from "chart.js";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
+
+// ─── Lucide React Icons (real SVG icons, replaces emoji icons) ─────────────
+// Make sure lucide-react is installed: npm install lucide-react
+import { TrendingUp, Users, Clock, Globe } from "lucide-react";
+
 import { getOverviewAPI, getMonthlyCollectionAPI, getLoanStatusAPI, getLoanTypeAPI, getAuditLogAPI } from "../../api/reports";
-import { getMemberStatsAPI } from "../../api/members";
-import { getApplicationsAPI } from "../../api/loans";
+import { getMemberStatsAPI, getApplicationsAPI } from "../../api/members";
+import { getActivityLogAPI } from "../../api/activity";
 import "./Dashboard.css";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
@@ -16,6 +21,8 @@ const COLLECTION_DAYS = [3, 7, 10, 14, 17, 20, 24, 28];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const ACTIVITY_DOT_COLORS = { payment:"#4caf50", application:"#1565c0", pending:"#f57c00", register:"#4caf50", declined:"#e53935" };
 
+// ─── StatCard — now uses real Lucide icon components ──────────────────────
+// The `icon` prop should be a JSX element, e.g. icon={<TrendingUp size={17} />}
 function StatCard({ label, value, icon }) {
   return (
     <div className="stat-card">
@@ -126,14 +133,16 @@ export default function Dashboard() {
   const [loanStat, setLoanStat] = useState({});
   const [loanType, setLoanType] = useState({});
   const [ledger,   setLedger]   = useState([]);
+  const [actLog,   setActLog]   = useState([]);
   const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [overview, mon, ls, lt, audit, memberStats, apps] = await Promise.allSettled([
+        const [overview, mon, ls, lt, audit, memberStats, apps, activity] = await Promise.allSettled([
           getOverviewAPI(), getMonthlyCollectionAPI(), getLoanStatusAPI(),
           getLoanTypeAPI(), getAuditLogAPI(), getMemberStatsAPI(), getApplicationsAPI(),
+          getActivityLogAPI(7),
         ]);
         if (overview.status==="fulfilled") {
           const d = overview.value;
@@ -144,10 +153,11 @@ export default function Dashboard() {
             onlineApplicants:     apps.status==="fulfilled" ? apps.value.filter(a=>a.status==="Pending").length : 0,
           });
         }
-        if (mon.status==="fulfilled")    setMonthly(mon.value);
-        if (ls.status==="fulfilled")     setLoanStat(ls.value);
-        if (lt.status==="fulfilled")     setLoanType(lt.value);
-        if (audit.status==="fulfilled")  setLedger(audit.value.slice(0,12));
+        if (mon.status==="fulfilled")      setMonthly(mon.value);
+        if (ls.status==="fulfilled")       setLoanStat(ls.value);
+        if (lt.status==="fulfilled")       setLoanType(lt.value);
+        if (audit.status==="fulfilled")    setLedger(audit.value.slice(0,12));
+        if (activity.status==="fulfilled") setActLog(activity.value);
       } catch(e) { console.error(e); }
       finally { setLoading(false); }
     };
@@ -192,20 +202,23 @@ export default function Dashboard() {
   const barOptions  = { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false}}, y:{grid:{color:"#f0f4f1"}} } };
   const doughnutOptions = { responsive:true, cutout:"68%", plugins:{ legend:{position:"bottom",labels:{boxWidth:8,padding:8,font:{size:10}}} } };
 
-  // Build activity log from ledger data
-  const activityLog = ledger.slice(0,7).map(l=>({
-    type: "payment",
-    text: `Member ${l.member_id} made a payment of ₱${Number(l.amount).toLocaleString()}`,
-    time: l.paid_at,
+  // Build activity log from real API
+  const activityLog = actLog.map(l => ({
+    type: l.action_type,
+    text: l.description,
+    time: new Date(l.created_at).toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }),
   }));
 
   return (
     <div className="dashboard-content">
       <div className="stat-grid">
-        <StatCard label="Total Share Capital"    value={`₱${stats.totalShareCapital.toLocaleString()}`} icon="📈"/>
-        <StatCard label="Active Members"         value={stats.activeMembers}                            icon="👤"/>
-        <StatCard label="Pending Loan Approvals" value={stats.pendingLoanApprovals}                     icon="⏳"/>
-        <StatCard label="Online Applicants"      value={stats.onlineApplicants}                         icon="🌐"/>
+        {/* ── Lucide icons used below: TrendingUp, Users, Clock, Globe ──────────
+            These are real SVG icons from the lucide-react package.
+            size={17} controls icon size inside the stat-icon box.           */}
+        <StatCard label="Total Share Capital"    value={`₱${stats.totalShareCapital.toLocaleString()}`} icon={<TrendingUp size={17} strokeWidth={2} />}/>
+        <StatCard label="Active Members"         value={stats.activeMembers}                            icon={<Users size={17} strokeWidth={2} />}/>
+        <StatCard label="Pending Loan Approvals" value={stats.pendingLoanApprovals}                     icon={<Clock size={17} strokeWidth={2} />}/>
+        <StatCard label="Online Applicants"      value={stats.onlineApplicants}                         icon={<Globe size={17} strokeWidth={2} />}/>
       </div>
 
       <div className="chart-row">
@@ -237,3 +250,58 @@ export default function Dashboard() {
     </div>
   );
 }
+
+/*
+════════════════════════════════════════════════════════════
+  📌 HOW TO ADD YOUR LOGO IMAGE (leaFmpc)
+════════════════════════════════════════════════════════════
+
+  This Dashboard does NOT contain the sidebar/header —
+  those are in a parent layout component (e.g. Layout.jsx
+  or Sidebar.jsx). Find that file and follow these steps:
+
+  STEP 1 — Save your logo file
+  ─────────────────────────────
+  Place your logo image inside:
+    src/assets/logo.png     ← recommended location
+  (PNG with transparent background works best)
+
+  STEP 2 — Import it in your layout/sidebar file
+  ──────────────────────────────────────────────
+  At the top of the file add:
+
+    import logo from "../../assets/logo.png";
+    // Adjust the path depending on where your file is located
+
+  STEP 3 — Render it where the logo currently appears
+  ────────────────────────────────────────────────────
+  Replace any existing text/placeholder logo with:
+
+    <img
+      src={logo}
+      alt="LEAF MPC Logo"
+      style={{ height: "40px", width: "auto", objectFit: "contain" }}
+    />
+
+  STEP 4 — Control the size
+  ──────────────────────────
+  Adjust height: "40px" to match your sidebar design.
+  Use objectFit: "contain" so the logo never gets cropped.
+
+  EXAMPLE (inside your Sidebar component):
+  ─────────────────────────────────────────
+    import logo from "../../assets/logo.png";
+
+    function Sidebar() {
+      return (
+        <aside className="sidebar">
+          <div className="sidebar-logo">
+            <img src={logo} alt="LEAF MPC" style={{ height: "44px", width: "auto" }} />
+          </div>
+          ... rest of sidebar
+        </aside>
+      );
+    }
+
+════════════════════════════════════════════════════════════
+*/

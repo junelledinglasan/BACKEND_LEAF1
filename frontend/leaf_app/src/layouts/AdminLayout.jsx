@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import {
+  LayoutDashboard, Users, UserCog, FileText,
+  CreditCard, CheckSquare, Megaphone, BarChart2, Leaf
+} from "lucide-react";
 import "./AdminLayout.css";
 
 const NAV_ITEMS = [
-  { to: "/admin/dashboard",    icon: "📊", label: "Dashboard"          },
-  { to: "/admin/members",      icon: "👥", label: "Manage Member"      },
-  { to: "/admin/staff",        icon: "🧑‍💼", label: "Manage Staff"      },
-  { to: "/admin/applications", icon: "📋", label: "Online Application" },
-  { to: "/admin/loan-payment", icon: "💸", label: "Loan Payment"       },
-  { to: "/admin/loan-approval",icon: "✅", label: "Loan Approval"      },
-  { to: "/admin/announcement", icon: "📢", label: "Announcement"       },
-  { to: "/admin/reports",      icon: "📑", label: "Reports"            },
+  { to: "/admin/dashboard",    icon: <LayoutDashboard size={15} />, label: "Dashboard"          },
+  { to: "/admin/members",      icon: <Users           size={15} />, label: "Manage Member"      },
+  { to: "/admin/staff",        icon: <UserCog         size={15} />, label: "Manage Staff"       },
+  { to: "/admin/applications", icon: <FileText        size={15} />, label: "Online Application" },
+  { to: "/admin/loan-payment", icon: <CreditCard      size={15} />, label: "Loan Payment"       },
+  { to: "/admin/loan-approval",icon: <CheckSquare     size={15} />, label: "Loan Approval"      },
+  { to: "/admin/announcement", icon: <Megaphone       size={15} />, label: "Announcement"       },
+  { to: "/admin/reports",      icon: <BarChart2       size={15} />, label: "Reports"            },
 ];
 
 const PAGE_CONFIG = {
@@ -728,7 +732,32 @@ export default function AdminLayout() {
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-logo">
-          <div className="logo-icon">🌿</div>
+          {/*
+          ════════════════════════════════════════════════════
+          📌 HOW TO ADD YOUR LOGO IMAGE HERE
+          ════════════════════════════════════════════════════
+          STEP 1: Save your logo file to:
+                  src/assets/logo.png  (transparent PNG)
+
+          STEP 2: Import it at the top of this file:
+                  import logo from "../../assets/logo.png";
+                  (adjust path based on your folder structure)
+
+          STEP 3: Replace the <div className="logo-icon"> block
+                  below with this:
+
+                  <img
+                    src={logo}
+                    alt="LEAF MPC Logo"
+                    style={{ height: "34px", width: "auto", objectFit: "contain" }}
+                  />
+
+          That's it! The logo will appear in the sidebar header.
+          ════════════════════════════════════════════════════
+          */}
+          <div className="logo-icon">
+            <Leaf size={18} color="#fff" />
+          </div>
           <div>
             <div className="logo-text">Leaf MPC</div>
             <div className="logo-sub">ADMIN</div>
@@ -760,8 +789,7 @@ export default function AdminLayout() {
             <span /><span /><span />
           </button>
           <div className="topbar-left">
-            <div className="page-title">{config.title}</div>
-            <div className="page-sub">{config.sub}</div>
+            <div className="topbar-brand">ADMIN</div>
           </div>
           <div className="topbar-right">
             {config.actions.map((action, i) => (
@@ -779,6 +807,10 @@ export default function AdminLayout() {
           </div>
         </header>
         <main className="page-content">
+          <div className="page-header">
+            <div className="page-title">{config.title}</div>
+            <div className="page-sub">{config.sub}</div>
+          </div>
           <Outlet />
         </main>
       </div>

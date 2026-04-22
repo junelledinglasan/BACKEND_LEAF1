@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from dateutil.relativedelta import relativedelta
 
+from activity_log.utils import log_activity
 from .models import Loan
 from .serializers import LoanSerializer, CreateLoanSerializer
 
@@ -12,7 +13,6 @@ from .serializers import LoanSerializer, CreateLoanSerializer
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def loan_list_view(request):
-
     if request.method == 'GET':
         loans = Loan.objects.all()
         if request.user.role == 'member':
@@ -28,6 +28,11 @@ def loan_list_view(request):
     s = CreateLoanSerializer(data=request.data)
     if s.is_valid():
         loan = s.save()
+        log_activity(
+            'loan',
+            f'Loan application submitted: {loan.loan_id} — {loan.member.fullname} — ₱{loan.amount:,.2f} ({loan.loan_type})',
+            request.user if request.user.is_authenticated else None
+        )
         return Response(LoanSerializer(loan).data, status=201)
     return Response(s.errors, status=400)
 
@@ -53,9 +58,20 @@ def loan_detail_view(request, pk):
             loan.approved_at   = timezone.now()
             loan.approved_by   = request.user.username
             loan.next_due_date = datetime.date.today() + relativedelta(months=1)
+            log_activity(
+                'loan',
+                f'Loan approved: {loan.loan_id} — {loan.member.fullname} — ₱{loan.amount:,.2f}',
+                request.user
+            )
         if new_status == 'Declined':
             loan.decline_reason = request.data.get('decline_reason', '')
+            log_activity(
+                'loan',
+                f'Loan declined: {loan.loan_id} — {loan.member.fullname} — Reason: {loan.decline_reason}',
+                request.user
+            )
         if request.data.get('remarks'):
             loan.remarks = request.data.get('remarks')
         loan.save()
+
     return Response(LoanSerializer(loan).data)

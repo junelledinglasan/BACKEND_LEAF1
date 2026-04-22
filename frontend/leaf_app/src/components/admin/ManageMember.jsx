@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { getMembersAPI, getMemberStatsAPI, getMemberAPI, updateMemberAPI, deleteMemberAPI } from "../../api/members";
-import { getApplicationsAPI, updateApplicationStatusAPI } from "../../api/loans";
+import { getMembersAPI, getMemberStatsAPI, getMemberAPI, updateMemberAPI, deleteMemberAPI, getApplicationsAPI, updateApplicationStatusAPI, convertToMemberAPI } from "../../api/members";
 import "./ManageMember.css";
 
 const STATUS_OPTIONS = ["All","Active","Inactive","Suspended"];
@@ -391,13 +390,20 @@ export default function ManageMember() {
     setLoading(true);
     try {
       const [mem, st, apps] = await Promise.allSettled([
-        getMembersAPI({ is_official: "true" }),
+        getMembersAPI(),
         getMemberStatsAPI(),
         getApplicationsAPI({ status: "Approved" }),
       ]);
-      if (mem.status==="fulfilled")  setMembers(mem.value);
-      if (st.status==="fulfilled")   setStats(st.value);
-      if (apps.status==="fulfilled") setPending(apps.value.filter(a => a.status==="Approved"));
+      if (mem.status==="fulfilled") setMembers(mem.value);
+      if (st.status==="fulfilled")  setStats(st.value);
+      if (apps.status==="fulfilled") {
+        // Kunin ang lahat ng application_id ng mga official members
+        const convertedIds = mem.status==="fulfilled"
+          ? mem.value.map(m => m.application_id).filter(Boolean)
+          : [];
+        // Ipakita lang ang hindi pa na-convert sa official member
+        setPending(apps.value.filter(a => !convertedIds.includes(a.id)));
+      }
     } catch(e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -436,11 +442,17 @@ export default function ManageMember() {
 
   const handleConvert = async (app) => {
     try {
-      await updateApplicationStatusAPI(app.id, "Approved");
+      const result = await convertToMemberAPI(app.id);
+      // Agad alisin sa pending list para hindi na lumabas
+      setPending(prev => prev.filter(p => p.id !== app.id));
       setViewPending(null);
-      showToast(`✓ ${app.firstname} ${app.lastname} process completed!`, "success");
+      showToast(`✓ ${app.firstname} ${app.lastname} is now an official member! ID: ${result.member_id}`, "success");
+      // I-refresh ang members list para lumabas sa Official Members tab
       fetchData();
-    } catch { showToast("Failed to convert member.", "danger"); }
+    } catch(err) {
+      const msg = err.response?.data?.error || "Failed to convert member.";
+      showToast(msg, "danger");
+    }
   };
 
   return (

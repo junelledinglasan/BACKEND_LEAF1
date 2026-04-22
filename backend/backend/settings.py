@@ -1,15 +1,12 @@
 from pathlib import Path
 from datetime import timedelta
 
-# ─── Base Directory ───────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── Security ─────────────────────────────────────────────────────────────────
 SECRET_KEY = 'django-insecure-leaf-mpc-2026-change-in-production'
 DEBUG      = True
 ALLOWED_HOSTS = ['*']
 
-# ─── Installed Apps ───────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,11 +28,11 @@ INSTALLED_APPS = [
     'payments',
     'announcements',
     'reports',
+    'activity_log',       # ← bagong app
 ]
 
-# ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',          # Must be FIRST
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,8 +62,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# ─── Database — PostgreSQL ────────────────────────────────────────────────────
-# ⚠️ Palitan ang PASSWORD ng iyong actual na PostgreSQL password
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
@@ -78,10 +73,8 @@ DATABASES = {
     }
 }
 
-# ─── Custom Auth User ─────────────────────────────────────────────────────────
 AUTH_USER_MODEL = 'auth_app.User'
 
-# ─── REST Framework ───────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -91,7 +84,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-# ─── JWT ──────────────────────────────────────────────────────────────────────
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME':    timedelta(hours=8),
     'REFRESH_TOKEN_LIFETIME':   timedelta(days=7),
@@ -102,17 +94,14 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM':            'user_id',
 }
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS  = True       # For development only
+CORS_ALLOW_ALL_ORIGINS  = True
 CORS_ALLOW_CREDENTIALS  = True
 
-# ─── Internationalization ─────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE     = 'Asia/Manila'
 USE_I18N      = True
 USE_TZ        = True
 
-# ─── Static & Media ───────────────────────────────────────────────────────────
 STATIC_URL         = '/static/'
 MEDIA_URL          = '/media/'
 MEDIA_ROOT         = BASE_DIR / 'media'

@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/payments/',      include('payments.urls')),
     path('api/announcements/', include('announcements.urls')),
     path('api/reports/',       include('reports.urls')),
+    path('api/activity-log/',  include('activity_log.urls')),  # ← bagong endpoint
 ]

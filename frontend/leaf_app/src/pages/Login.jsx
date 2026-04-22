@@ -10,7 +10,7 @@ export default function Login() {
   const [form,   setForm]   = useState({ username: "", password: "" });
   const [error,  setError]  = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [showMsg,setShowMsg]= useState("");
+  const [showMsg,setShowMsg]= useState(false);
 
   const handle = e => {
     setForm(p => ({ ...p, [e.target.name]: e.target.value }));
@@ -29,31 +29,33 @@ export default function Login() {
     }
 
     // Auto-redirect based on role
-    if (result.role === "admin")  navigate("/admin/dashboard", { replace: true });
-    if (result.role === "staff")  navigate("/staff/home",      { replace: true });
-    if (result.role === "member") navigate("/member/dashboard",{ replace: true });
+    if (result.role === "admin")  navigate("/admin/dashboard",  { replace: true });
+    if (result.role === "staff")  navigate("/staff/home",       { replace: true });
+    if (result.role === "member") navigate("/member/dashboard", { replace: true });
   };
 
-  const handleKeyDown = e => { if (e.key === "Enter") handleSubmit(); };
+  const handleKeyDown = e => {
+    if (e.key === "Enter") handleSubmit();
+  };
 
   return (
     <div className="lp-page">
 
-      {/* ── Forgot Password Modal ── */}
+      {/* Forgot Password Modal */}
       {showMsg && (
-        <div className="lp-msg-overlay" onClick={() => setShowMsg("")}>
+        <div className="lp-msg-overlay" onClick={() => setShowMsg(false)}>
           <div className="lp-msg-box" onClick={e => e.stopPropagation()}>
             <div className="lp-msg-icon">🔒</div>
             <div className="lp-msg-title">Forgot Password?</div>
             <div className="lp-msg-text">
-              For password reset, please visit the office or contact the LEAF MPC administrator.
+              Para sa password reset, mangyaring bumisita sa opisina o makipag-ugnayan sa LEAF MPC administrator.
             </div>
-            <button className="lp-msg-btn" onClick={() => setShowMsg("")}>Got it</button>
+            <button className="lp-msg-btn" onClick={() => setShowMsg(false)}>Got it</button>
           </div>
         </div>
       )}
 
-      {/* ── Left Panel ── */}
+      {/* Left Panel */}
       <div className="lp-left">
         <div className="lp-left-content">
           {/*
@@ -68,15 +70,15 @@ export default function Login() {
             ╚══════════════════════════════════════╝
           */}
           <div className="lp-logo-placeholder">
-            {/* ILAGAY DITO ANG LOGO */}
-            <div className="lp-logo-text">leafmpc</div>
+            <span className="lp-logo-emoji">🌿</span>
+            <span className="lp-logo-text">leafmpc</span>
           </div>
           <div className="lp-left-title">Cooperative Management System</div>
           <div className="lp-left-sub">Admin, Staff and Member Portal</div>
         </div>
       </div>
 
-      {/* ── Right Panel ── */}
+      {/* Right Panel */}
       <div className="lp-right">
         <div className="lp-card">
 
@@ -126,7 +128,7 @@ export default function Login() {
             </div>
 
             <div className="lp-links-row">
-              <button className="lp-link" onClick={() => setShowMsg("forgot")}>
+              <button className="lp-link" onClick={() => setShowMsg(true)}>
                 Forgot Password?
               </button>
               <button className="lp-link" onClick={() => navigate("/register")}>
